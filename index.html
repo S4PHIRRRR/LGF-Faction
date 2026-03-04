@@ -393,7 +393,7 @@
 
     <!-- STAFF -->
     <div class="recruit-tab-content" id="recruitTabStaff">
-      <p class="recruit-intro">Rejoins l'équipe dirigeante ! Nous cherchons des joueurs expérimentés et investis pour renforcer notre staff.</p>
+      <p class="recruit-intro">Join our staff team !</p>
       <div class="recruit-requirements" style="margin-bottom:3rem;">
         <div class="staff-req-item reveal"><div class="req-icon">👑</div><div class="req-text"><strong>Ancienneté</strong>Minimum 1 mois en faction ou sur le serveur.</div></div>
         <div class="staff-req-item reveal"><div class="req-icon">🧠</div><div class="req-text"><strong>Leadership</strong>Capacité à encadrer et motiver.</div></div>
@@ -401,14 +401,14 @@
         <div class="staff-req-item reveal"><div class="req-icon">🎙️</div><div class="req-text"><strong>Communication</strong>Excellente gestion du Discord.</div></div>
       </div>
       <div class="recruit-form-wrap reveal">
-        <div class="form-group"><label class="form-label">Pseudo Minecraft *</label><input class="form-input" type="text" id="sPseudo" placeholder="TonPseudo2024"></div>
-        <div class="form-group"><label class="form-label">Âge *</label><input class="form-input" type="number" id="sAge" placeholder="18" min="14" max="99"></div>
-        <div class="form-group"><label class="form-label">Poste souhaité *</label>
-          <select class="form-select" id="sPost"><option value="">— Choisir —</option><option>Officier</option><option>Responsable Recrutement</option><option>Responsable Économie</option><option>Responsable Défense</option><option>Chef de Guerre</option></select>
+        <div class="form-group"><label class="form-label">Gamertag Minecraft *</label><input class="form-input" type="text" id="sPseudo" placeholder="TonPseudo2024"></div>
+        <div class="form-group"><label class="form-label">Old *</label><input class="form-input" type="number" id="sAge" placeholder="18" min="14" max="99"></div>
+        <div class="form-group"><label class="form-label">Which post you want ? *</label>
+          <select class="form-select" id="sPost"><option value="">— Choose —</option><option>Manager staff</option><option>Recruitements chief</option><option>Staff</option><option>Developper</option></select>
         </div>
-        <div class="form-group"><label class="form-label">Expérience en gestion de faction</label><textarea class="form-textarea" id="sExperience" placeholder="Décris ton expérience..."></textarea></div>
-        <div class="form-group"><label class="form-label">Motivation *</label><textarea class="form-textarea" id="sMotivation" placeholder="Pourquoi veux-tu rejoindre le staff LGF ?"></textarea></div>
-        <button class="form-submit admin-submit" onclick="submitStaffApp()">Soumettre ma candidature staff</button>
+        <div class="form-group"><label class="form-label">Expériences in staff</label><textarea class="form-textarea" id="sExperience" placeholder="Décris ton expérience..."></textarea></div>
+        <div class="form-group"><label class="form-label">Why you ? *</label><textarea class="form-textarea" id="sMotivation" placeholder="Pourquoi veux-tu rejoindre le staff LGF ?"></textarea></div>
+        <button class="form-submit admin-submit" onclick="submitStaffApp()">Send</button>
         <div class="form-alert" id="staffAppAlert"></div>
       </div>
     </div>
@@ -425,23 +425,23 @@
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-title">LGF</div>
-    <div class="modal-subtitle">Espace membre</div>
+    <div class="modal-subtitle">Member Space</div>
     <div class="modal-tabs">
-      <button class="modal-tab active" onclick="switchTab('login')">Connexion</button>
-      <button class="modal-tab" onclick="switchTab('register')">Inscription</button>
+      <button class="modal-tab active" onclick="switchTab('login')">Log in</button>
+      <button class="modal-tab" onclick="switchTab('register')">Register</button>
     </div>
     <div class="modal-form active" id="formLogin">
       <div class="modal-alert" id="loginAlert"></div>
-      <div class="form-group"><label class="form-label">Pseudo Minecraft</label><input class="form-input" type="text" id="loginUser" placeholder="TonPseudo" autocomplete="username"></div>
-      <div class="form-group"><label class="form-label">Mot de passe</label><input class="form-input" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <button class="form-submit" onclick="doLogin()">Se connecter</button>
+      <div class="form-group"><label class="form-label">Gamertag Minecraft</label><input class="form-input" type="text" id="loginUser" placeholder="TonPseudo" autocomplete="username"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="form-submit" onclick="doLogin()">Login</button>
     </div>
     <div class="modal-form" id="formRegister">
       <div class="modal-alert" id="registerAlert"></div>
-      <div class="form-group"><label class="form-label">Pseudo Minecraft</label><input class="form-input" type="text" id="regUser" placeholder="TonPseudo"></div>
-      <div class="form-group"><label class="form-label">Mot de passe</label><input class="form-input" type="password" id="regPass" placeholder="Minimum 6 caractères"></div>
-      <div class="form-group"><label class="form-label">Confirmer</label><input class="form-input" type="password" id="regPassConfirm" placeholder="Répéter" onkeydown="if(event.key==='Enter')doRegister()"></div>
-      <button class="form-submit" onclick="doRegister()">Créer un compte</button>
+      <div class="form-group"><label class="form-label">Gamertag Minecraft</label><input class="form-input" type="text" id="regUser" placeholder="TonPseudo"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="regPass" placeholder="Minimum 6 caractères"></div>
+      <div class="form-group"><label class="form-label">Confirm</label><input class="form-input" type="password" id="regPassConfirm" placeholder="Répéter" onkeydown="if(event.key==='Enter')doRegister()"></div>
+      <button class="form-submit" onclick="doRegister()">Create an account</button>
     </div>
   </div>
 </div>
@@ -666,8 +666,8 @@ function submitStaffApp() {
   const pseudo=document.getElementById('sPseudo').value.trim();
   const age=document.getElementById('sAge').value;
   const post=document.getElementById('sPost').value;
-  const motivation=document.getElementById('sWhy you ?').value.trim();
-  const experience=document.getElementById('sExperiences').value.trim();
+  const motivation=document.getElementById('sMotivation').value.trim();
+  const experience=document.getElementById('sExperience').value.trim();
   if(!pseudo||!age||!post||!motivation) return showFormAlert('staffAppAlert','Remplis tous les champs obligatoires (*).','error');
   staffApps.unshift({id:Date.now(),type:'staff',pseudo,age,post,motivation,experience:experience||'(non renseigné)',status:'pending',date:now()});
   showFormAlert('staffAppAlert',`✅ Candidature staff de "${pseudo}" envoyée ! Elle sera examinée par nos leaders.`,'success');
