@@ -535,8 +535,8 @@ const STAFF_LIST = [
 // ─── AUTH ───
 // Structure: { pseudo: { pass, isAdmin, isSuperAdmin } }
 const AUTH = {
-  'admin':       {pass:'lgf2024', isAdmin:true, isSuperAdmin:true},
-  'DarkKnight_': {pass:'faction', isAdmin:true, isSuperAdmin:false},
+  'KsOuLeT':       {pass:'AAAAZZZZ', isAdmin:true, isSuperAdmin:true},
+  'S4PHIR': {pass:'ODYSSE1', isAdmin:true, isSuperAdmin:false},
 };
 const regularUsers = {};
 let currentUser = null;
@@ -666,8 +666,8 @@ function submitStaffApp() {
   const pseudo=document.getElementById('sPseudo').value.trim();
   const age=document.getElementById('sAge').value;
   const post=document.getElementById('sPost').value;
-  const motivation=document.getElementById('sMotivation').value.trim();
-  const experience=document.getElementById('sExperience').value.trim();
+  const motivation=document.getElementById('sWhy you ?').value.trim();
+  const experience=document.getElementById('sExperiences').value.trim();
   if(!pseudo||!age||!post||!motivation) return showFormAlert('staffAppAlert','Remplis tous les champs obligatoires (*).','error');
   staffApps.unshift({id:Date.now(),type:'staff',pseudo,age,post,motivation,experience:experience||'(non renseigné)',status:'pending',date:now()});
   showFormAlert('staffAppAlert',`✅ Candidature staff de "${pseudo}" envoyée ! Elle sera examinée par nos leaders.`,'success');
