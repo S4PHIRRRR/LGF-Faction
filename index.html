@@ -1,6 +1,34 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAcRldocRqndTVxKbw9QlRCrXc_d8mFmtI",
+    authDomain: "lgf-faction.firebaseapp.com",
+    projectId: "lgf-faction",
+    storageBucket: "lgf-faction.firebasestorage.app",
+    messagingSenderId: "197055213297",
+    appId: "1:197055213297:web:c6b84053cb2f61d214c350",
+    measurementId: "G-NBJCJ5F88G"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window._db = db;
+  window._col = collection;
+  window._addDoc = addDoc;
+  window._onSnapshot = onSnapshot;
+  window._doc = doc;
+  window._updateDoc = updateDoc;
+  window._query = query;
+  window._orderBy = orderBy;
+  window._firebaseReady = true;
+  window.dispatchEvent(new Event('firebaseReady'));
+</script>
+</head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LGF — La Guilde des Factions</title>
@@ -393,22 +421,22 @@
 
     <!-- STAFF -->
     <div class="recruit-tab-content" id="recruitTabStaff">
-      <p class="recruit-intro">Join our staff team !</p>
+      <p class="recruit-intro">Rejoins l'équipe dirigeante ! Nous cherchons des joueurs expérimentés et investis pour renforcer notre staff.</p>
       <div class="recruit-requirements" style="margin-bottom:3rem;">
-        <div class="staff-req-item reveal"><div class="req-icon">👑</div><div class="req-text"><strong>How many hours in game ?</strong>Minimum 2 months on the server.</div></div>
-        <div class="staff-req-item reveal"><div class="req-icon">🧠</div><div class="req-text"><strong>Leadership</strong>Yes or Not and justify your answer.</div></div>
-        <div class="staff-req-item reveal"><div class="req-icon">⏰</div><div class="req-text"><strong>Engagement</strong>How many hours per week approximatly ?</div></div>
-        <div class="staff-req-item reveal"><div class="req-icon">🎙️</div><div class="req-text"><strong>Communication</strong>Discord, Minecraft, commands...</div></div>
+        <div class="staff-req-item reveal"><div class="req-icon">👑</div><div class="req-text"><strong>Ancienneté</strong>Minimum 1 mois en faction ou sur le serveur.</div></div>
+        <div class="staff-req-item reveal"><div class="req-icon">🧠</div><div class="req-text"><strong>Leadership</strong>Capacité à encadrer et motiver.</div></div>
+        <div class="staff-req-item reveal"><div class="req-icon">⏰</div><div class="req-text"><strong>Engagement fort</strong>Minimum 20h/semaine.</div></div>
+        <div class="staff-req-item reveal"><div class="req-icon">🎙️</div><div class="req-text"><strong>Communication</strong>Excellente gestion du Discord.</div></div>
       </div>
       <div class="recruit-form-wrap reveal">
-        <div class="form-group"><label class="form-label">Gamertag Minecraft *</label><input class="form-input" type="text" id="sPseudo" placeholder="GamerTag2026"></div>
-        <div class="form-group"><label class="form-label">Old *</label><input class="form-input" type="number" id="sAge" placeholder="18" min="14" max="99"></div>
-        <div class="form-group"><label class="form-label">Which post you want ? *</label>
-          <select class="form-select" id="sPost"><option value="">— Choose —</option><option>Manager staff</option><option>Recruitements chief</option><option>Staff</option><option>Developper</option></select>
+        <div class="form-group"><label class="form-label">Pseudo Minecraft *</label><input class="form-input" type="text" id="sPseudo" placeholder="TonPseudo2024"></div>
+        <div class="form-group"><label class="form-label">Âge *</label><input class="form-input" type="number" id="sAge" placeholder="18" min="14" max="99"></div>
+        <div class="form-group"><label class="form-label">Poste souhaité *</label>
+          <select class="form-select" id="sPost"><option value="">— Choisir —</option><option>Officier</option><option>Responsable Recrutement</option><option>Responsable Économie</option><option>Responsable Défense</option><option>Chef de Guerre</option></select>
         </div>
-        <div class="form-group"><label class="form-label">Expériences in staff</label><textarea class="form-textarea" id="sExperiences" placeholder="Discribe your expérience..."></textarea></div>
-        <div class="form-group"><label class="form-label">Why you ? *</label><textarea class="form-textarea" id="sMotivation" placeholder="Why you want to join our staff team ?"></textarea></div>
-        <button class="form-submit admin-submit" onclick="submitStaffApp()">Send</button>
+        <div class="form-group"><label class="form-label">Expérience en gestion de faction</label><textarea class="form-textarea" id="sExperience" placeholder="Décris ton expérience..."></textarea></div>
+        <div class="form-group"><label class="form-label">Motivation *</label><textarea class="form-textarea" id="sMotivation" placeholder="Pourquoi veux-tu rejoindre le staff LGF ?"></textarea></div>
+        <button class="form-submit admin-submit" onclick="submitStaffApp()">Soumettre ma candidature staff</button>
         <div class="form-alert" id="staffAppAlert"></div>
       </div>
     </div>
@@ -425,23 +453,23 @@
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-title">LGF</div>
-    <div class="modal-subtitle">Member Space</div>
+    <div class="modal-subtitle">Espace membre</div>
     <div class="modal-tabs">
-      <button class="modal-tab active" onclick="switchTab('login')">Log in</button>
-      <button class="modal-tab" onclick="switchTab('register')">Register</button>
+      <button class="modal-tab active" onclick="switchTab('login')">Connexion</button>
+      <button class="modal-tab" onclick="switchTab('register')">Inscription</button>
     </div>
     <div class="modal-form active" id="formLogin">
       <div class="modal-alert" id="loginAlert"></div>
-      <div class="form-group"><label class="form-label">Gamertag Minecraft</label><input class="form-input" type="text" id="loginUser" placeholder="TonPseudo" autocomplete="username"></div>
-      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <button class="form-submit" onclick="doLogin()">Login</button>
+      <div class="form-group"><label class="form-label">Pseudo Minecraft</label><input class="form-input" type="text" id="loginUser" placeholder="TonPseudo" autocomplete="username"></div>
+      <div class="form-group"><label class="form-label">Mot de passe</label><input class="form-input" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="form-submit" onclick="doLogin()">Se connecter</button>
     </div>
     <div class="modal-form" id="formRegister">
       <div class="modal-alert" id="registerAlert"></div>
-      <div class="form-group"><label class="form-label">Gamertag Minecraft</label><input class="form-input" type="text" id="regUser" placeholder="TonPseudo"></div>
-      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="regPass" placeholder="Minimum 6 caractères"></div>
-      <div class="form-group"><label class="form-label">Confirm</label><input class="form-input" type="password" id="regPassConfirm" placeholder="Répéter" onkeydown="if(event.key==='Enter')doRegister()"></div>
-      <button class="form-submit" onclick="doRegister()">Create an account</button>
+      <div class="form-group"><label class="form-label">Pseudo Minecraft</label><input class="form-input" type="text" id="regUser" placeholder="TonPseudo"></div>
+      <div class="form-group"><label class="form-label">Mot de passe</label><input class="form-input" type="password" id="regPass" placeholder="Minimum 6 caractères"></div>
+      <div class="form-group"><label class="form-label">Confirmer</label><input class="form-input" type="password" id="regPassConfirm" placeholder="Répéter" onkeydown="if(event.key==='Enter')doRegister()"></div>
+      <button class="form-submit" onclick="doRegister()">Créer un compte</button>
     </div>
   </div>
 </div>
@@ -535,8 +563,8 @@ const STAFF_LIST = [
 // ─── AUTH ───
 // Structure: { pseudo: { pass, isAdmin, isSuperAdmin } }
 const AUTH = {
-  'KsOuLeT':       {pass:'AAAAZZZZ', isAdmin:true, isSuperAdmin:true},
-  'S4PHIR': {pass:'ODYSSE1', isAdmin:true, isSuperAdmin:false},
+  'admin':       {pass:'lgf2024', isAdmin:true, isSuperAdmin:true},
+  'DarkKnight_': {pass:'faction', isAdmin:true, isSuperAdmin:false},
 };
 const regularUsers = {};
 let currentUser = null;
@@ -648,34 +676,34 @@ function showFormAlert(id,msg,type) {
   setTimeout(()=>el.style.display='none',5000);
 }
 
-// ─── SUBMIT FACTION APP ───
-function submitFactionApp() {
-  const pseudo=document.getElementById('rPseudo').value.trim();
-  const age=document.getElementById('rAge').value;
-  const specialty=document.getElementById('rSpecialty').value;
-  const hours=document.getElementById('rHours').value;
-  const reason=document.getElementById('rReason').value.trim();
-  if(!pseudo||!age||!specialty||!hours) return showFormAlert('factionAlert','Remplis tous les champs obligatoires (*).','error');
-  factionApps.unshift({id:Date.now(),type:'faction',pseudo,age,specialty,hours,reason:reason||'(non renseigné)',status:'pending',date:now()});
-  showFormAlert('factionAlert',`✅ Candidature de "${pseudo}" envoyée ! Le staff te contactera sous 48h.`,'success');
-  ['rPseudo','rAge','rSpecialty','rHours','rReason'].forEach(id=>document.getElementById(id).value='');
+async function submitFactionApp() {
+  const pseudo = document.getElementById('rPseudo').value.trim();
+  const age = document.getElementById('rAge').value;
+  const specialty = document.getElementById('rSpecialty').value;
+  const hours = document.getElementById('rHours').value;
+  const reason = document.getElementById('rReason').value.trim();
+  if (!pseudo||!age||!specialty||!hours) return showFormAlert('factionAlert','Remplis tous les champs obligatoires (*).','error');
+
+  const app = { type:'faction', pseudo, age, specialty, hours, reason:reason||'(non renseigné)', status:'pending', date:now(), createdAt: Date.now() };
+  await window._addDoc(window._col(window._db, 'applications'), app);
+  sendDiscordNotif(app);
+  showFormAlert('factionAlert', `✅ Candidature de "${pseudo}" envoyée !`, 'success');
+  ['rPseudo','rAge','rSpecialty','rHours','rReason'].forEach(id => document.getElementById(id).value='');
 }
 
-// ─── SUBMIT STAFF APP ───
-function submitStaffApp() {
-  const pseudo=document.getElementById('sPseudo').value.trim();
-  const age=document.getElementById('sAge').value;
-  const post=document.getElementById('sPost').value;
-  const motivation=document.getElementById('sMotivation').value.trim();
-  const experience=document.getElementById('sExperience').value.trim();
-  if(!pseudo||!age||!post||!motivation) return showFormAlert('staffAppAlert','Remplis tous les champs obligatoires (*).','error');
-  staffApps.unshift({id:Date.now(),type:'staff',pseudo,age,post,motivation,experience:experience||'(non renseigné)',status:'pending',date:now()});
-  showFormAlert('staffAppAlert',`✅ Candidature staff de "${pseudo}" envoyée ! Elle sera examinée par nos leaders.`,'success');
-  ['sPseudo','sAge','sPost','sMotivation','sExperience'].forEach(id=>document.getElementById(id).value='');
-}
+async function submitStaffApp() {
+  const pseudo = document.getElementById('sPseudo').value.trim();
+  const age = document.getElementById('sAge').value;
+  const post = document.getElementById('sPost').value;
+  const motivation = document.getElementById('sMotivation').value.trim();
+  const experience = document.getElementById('sExperience').value.trim();
+  if (!pseudo||!age||!post||!motivation) return showFormAlert('staffAppAlert','Remplis tous les champs obligatoires (*).','error');
 
-function now() {
-  return new Date().toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const app = { type:'staff', pseudo, age, post, motivation, experience:experience||'(non renseigné)', status:'pending', date:now(), createdAt: Date.now() };
+  await window._addDoc(window._col(window._db, 'applications'), app);
+  sendDiscordNotif(app);
+  showFormAlert('staffAppAlert', `✅ Candidature staff de "${pseudo}" envoyée !`, 'success');
+  ['sPseudo','sAge','sPost','sMotivation','sExperience'].forEach(id => document.getElementById(id).value='');
 }
 
 // ─── ADMIN PANEL ───
@@ -733,8 +761,8 @@ function buildAppCard(app) {
     :`<div class="app-meta-item">Spécialité : <span>${app.specialty}</span></div><div class="app-meta-item">Dispo : <span>${app.hours}</span></div><div class="app-meta-item">Âge : <span>${app.age} ans</span></div>`;
   const quote=isStaff?app.motivation:app.reason;
   const actions=app.status==='pending'
-    ?`<button class="app-btn accept" onclick="updateApp(${app.id},'${app.type}','accepted')">✅ Accepter</button><button class="app-btn refuse" onclick="updateApp(${app.id},'${app.type}','refused')">❌ Refuser</button>`
-    :`<button class="app-btn neutral" onclick="updateApp(${app.id},'${app.type}','pending')">↩ Remettre en attente</button>`;
+    ?`<button class="app-btn accept" onclick="updateApp('${app.id}','accepted')">✅ Accepter</button><button class="app-btn refuse" onclick="updateApp('${app.id}','refused')">❌ Refuser</button>`
+    :`<button class="app-btn neutral" onclick="updateApp('${app.id}','pending')">↩ Remettre en attente</button>`;
   return `<div class="app-card ${app.status}${isStaff?' staff-type':''}">
     <div class="app-card-header">
       <div class="app-pseudo${isStaff?' staff-type':''}">${isStaff?'🛡':'⚔'} ${app.pseudo}</div>
@@ -750,14 +778,10 @@ function emptyState(msg) {
   return `<div class="empty-state"><div class="empty-icon">📭</div><p>${msg}</p></div>`;
 }
 
-function updateApp(id,type,status) {
-  const arr=type==='faction'?factionApps:staffApps;
-  const app=arr.find(a=>a.id===id);
-  if(app) app.status=status;
-  if(type==='faction') renderFactionApps('all');
-  else renderStaffApps('all');
-  renderAdminDashboard();
+async function updateApp(id, status) {
+  await window._updateDoc(window._doc(window._db, 'applications', id), { status });
 }
+
 
 // ─── ADMIN MANAGEMENT ───
 function renderAdminList() {
@@ -795,7 +819,24 @@ function removeAdmin(name) {
 
 // ─── INIT ───
 renderMembers(); renderStaff(); createParticles();
-setTimeout(checkReveal,100); setTimeout(animateCounters,500);
+setTimeout(checkReveal, 100); setTimeout(animateCounters, 500);
+
+// Écoute Firebase en temps réel
+window.addEventListener('firebaseReady', () => {
+  const q = window._query(window._col(window._db, 'applications'), window._orderBy('createdAt','desc'));
+  window._onSnapshot(q, (snapshot) => {
+    factionApps = [];
+    staffApps = [];
+    snapshot.forEach(docSnap => {
+      const data = { ...docSnap.data(), id: docSnap.id };
+      if (data.type === 'faction') factionApps.push(data);
+      else staffApps.push(data);
+    });
+    renderAdminDashboard();
+    renderFactionApps('all');
+    renderStaffApps('all');
+  });
+});
 
 // Demo data
 factionApps.push({id:1001,type:'faction',pseudo:'KsOuLeT Le Ptit PD',age:'27',specialty:'PvP / Combattant',hours:'20–30h',reason:"Je suis nul a chier masi je suis drole donc prenez moi",status:'pending',date:'03/03/2024 14:22'});
