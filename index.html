@@ -1,5 +1,239 @@
 <!DOCTYPE html>
 <html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LGF — La Guilde des Factions</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c; --gold-light: #f0d080; --gold-dark: #8b6914;
+    --emerald: #1a4a2e; --emerald-light: #2d7a4e; --emerald-dark: #0d2418;
+    --black: #080c0a; --stone: #1c1f1d; --stone-light: #2a2e2b;
+    --text: #d4c9a8; --text-dim: #8a8270; --danger: #c0392b;
+    --admin: #7b2fff; --admin-light: #a066ff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:'Raleway',sans-serif; background:var(--black); color:var(--text); overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background: radial-gradient(ellipse 80% 50% at 50% -10%,rgba(201,168,76,.08) 0%,transparent 70%),
+                radial-gradient(ellipse 60% 40% at 80% 80%,rgba(26,74,46,.12) 0%,transparent 60%),
+                repeating-linear-gradient(0deg,transparent,transparent 31px,rgba(201,168,76,.025) 32px),
+                repeating-linear-gradient(90deg,transparent,transparent 31px,rgba(201,168,76,.025) 32px); }
+  #particles { position:fixed; inset:0; pointer-events:none; z-index:1; }
+  .particle { position:absolute; width:2px; height:2px; background:var(--gold); border-radius:50%; animation:float linear infinite; opacity:0; }
+  @keyframes float { 0%{transform:translateY(100vh);opacity:0} 10%{opacity:.6} 90%{opacity:.3} 100%{transform:translateY(-10vh) translateX(40px);opacity:0} }
+  nav { position:fixed; top:0; width:100%; z-index:1000; background:linear-gradient(180deg,rgba(8,12,10,.97),rgba(8,12,10,.85)); border-bottom:1px solid rgba(201,168,76,.25); backdrop-filter:blur(12px); }
+  .nav-inner { max-width:1200px; margin:0 auto; padding:0 2rem; height:64px; display:flex; align-items:center; justify-content:space-between; }
+  .nav-logo { font-family:'Cinzel Decorative',serif; font-size:1.6rem; font-weight:900; background:linear-gradient(135deg,var(--gold),var(--gold-light),var(--gold-dark)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; cursor:pointer; transition:filter .3s; }
+  .nav-logo:hover { filter:brightness(1.3); }
+  .nav-links { display:flex; align-items:center; gap:.4rem; list-style:none; flex-wrap:wrap; }
+  .nav-links > li { position:relative; }
+  .nav-btn { font-family:'Cinzel',serif; font-size:.72rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); padding:.5rem .8rem; border:none; background:transparent; cursor:pointer; transition:color .25s; white-space:nowrap; }
+  .nav-btn:hover { color:var(--gold-light); }
+  .has-dropdown > .nav-btn::after { content:' ▾'; font-size:.6rem; }
+  .dropdown { position:absolute; top:calc(100% + 8px); left:50%; transform:translateX(-50%) scaleY(.9); transform-origin:top; background:rgba(12,16,13,.97); border:1px solid rgba(201,168,76,.3); border-top:2px solid var(--gold); min-width:180px; opacity:0; pointer-events:none; transition:opacity .2s,transform .2s; z-index:999; }
+  .has-dropdown:hover .dropdown { opacity:1; pointer-events:all; transform:translateX(-50%) scaleY(1); }
+  .dropdown a { display:block; font-family:'Cinzel',serif; font-size:.72rem; letter-spacing:.1em; color:var(--text-dim); padding:.75rem 1.2rem; text-decoration:none; transition:color .2s,background .2s,padding-left .2s; border-bottom:1px solid rgba(201,168,76,.08); cursor:pointer; }
+  .dropdown a:last-child { border-bottom:none; }
+  .dropdown a:hover { color:var(--gold-light); background:rgba(201,168,76,.06); padding-left:1.6rem; }
+  .nav-login { font-family:'Cinzel',serif; font-size:.72rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--black); background:linear-gradient(135deg,var(--gold),var(--gold-light)); border:none; padding:.5rem 1.2rem; cursor:pointer; clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); transition:filter .25s,transform .2s; }
+  .nav-login:hover { filter:brightness(1.2); transform:translateY(-1px); }
+  .nav-user { display:none; align-items:center; gap:.6rem; font-family:'Cinzel',serif; font-size:.7rem; color:var(--gold); letter-spacing:.08em; }
+  .nav-user.visible { display:flex; }
+  .nav-user-avatar { width:28px; height:28px; background:var(--stone-light); border:1px solid rgba(201,168,76,.4); border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:.9rem; }
+  .nav-logout { background:none; border:none; color:var(--text-dim); font-size:.65rem; letter-spacing:.1em; cursor:pointer; font-family:'Cinzel',serif; transition:color .2s; }
+  .nav-logout:hover { color:var(--danger); }
+  .nav-admin-btn { font-family:'Cinzel',serif; font-size:.68rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--admin-light); background:rgba(123,47,255,.15); border:1px solid rgba(123,47,255,.4); padding:.4rem .9rem; cursor:pointer; transition:all .2s; display:none; }
+  .nav-admin-btn.visible { display:inline-block; }
+  .nav-admin-btn:hover { background:rgba(123,47,255,.3); border-color:var(--admin-light); }
+  #home { position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; z-index:2; overflow:hidden; }
+  .hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 100% 70% at 50% 60%,rgba(26,74,46,.15) 0%,transparent 70%),radial-gradient(ellipse 60% 60% at 50% 50%,rgba(201,168,76,.06) 0%,transparent 60%); }
+  .hero-emblem { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:500px; height:500px; opacity:.04; border:2px solid var(--gold); border-radius:50%; animation:rotate-slow 30s linear infinite; }
+  .hero-emblem::before { content:''; position:absolute; inset:20px; border:1px solid var(--gold); border-radius:50%; }
+  .hero-emblem::after { content:''; position:absolute; inset:50px; border:1px dashed var(--gold); border-radius:50%; }
+  @keyframes rotate-slow { to { transform:translate(-50%,-50%) rotate(360deg); } }
+  .hero-content { position:relative; z-index:3; }
+  .hero-eyebrow { font-family:'Cinzel',serif; font-size:.7rem; letter-spacing:.4em; color:var(--gold); text-transform:uppercase; margin-bottom:1.5rem; opacity:0; animation:fadeUp .8s .3s forwards; }
+  .hero-title { font-family:'Cinzel Decorative',serif; font-size:clamp(4rem,12vw,9rem); font-weight:900; line-height:.9; background:linear-gradient(180deg,var(--gold-light),var(--gold) 40%,var(--gold-dark)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 40px rgba(201,168,76,.3)); opacity:0; animation:fadeUp .8s .5s forwards; }
+  .hero-subtitle { font-family:'Cinzel',serif; font-size:clamp(.9rem,2vw,1.1rem); letter-spacing:.35em; color:var(--emerald-light); text-transform:uppercase; margin-top:1rem; margin-bottom:2.5rem; opacity:0; animation:fadeUp .8s .7s forwards; }
+  .hero-divider { width:200px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:0 auto 2.5rem; opacity:0; animation:fadeIn 1s .9s forwards; }
+  .hero-tagline { font-size:1rem; font-weight:300; color:var(--text-dim); letter-spacing:.05em; max-width:480px; line-height:1.8; opacity:0; animation:fadeUp .8s 1s forwards; }
+  .hero-cta { display:inline-flex; gap:1rem; margin-top:2.5rem; opacity:0; animation:fadeUp .8s 1.2s forwards; flex-wrap:wrap; justify-content:center; }
+  .btn-primary { font-family:'Cinzel',serif; font-size:.75rem; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--black); background:linear-gradient(135deg,var(--gold),var(--gold-light)); border:none; padding:.85rem 2rem; cursor:pointer; clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%); transition:filter .3s,transform .2s; }
+  .btn-primary:hover { filter:brightness(1.15); transform:translateY(-2px); }
+  .btn-secondary { font-family:'Cinzel',serif; font-size:.75rem; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); background:transparent; border:1px solid rgba(201,168,76,.4); padding:.85rem 2rem; cursor:pointer; transition:border-color .3s,color .3s,background .3s,transform .2s; }
+  .btn-secondary:hover { border-color:var(--gold); background:rgba(201,168,76,.08); transform:translateY(-2px); }
+  .scroll-indicator { position:absolute; bottom:2rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:.5rem; opacity:0; animation:fadeIn 1s 2s forwards,bob 2s 3s ease-in-out infinite; }
+  .scroll-indicator span { font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:.3em; color:var(--gold); }
+  .scroll-arrow { width:20px; height:20px; border-right:1px solid var(--gold); border-bottom:1px solid var(--gold); transform:rotate(45deg); }
+  @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+  @keyframes fadeIn { to{opacity:1} }
+  section { position:relative; z-index:2; }
+  .section-container { max-width:1100px; margin:0 auto; padding:6rem 2rem; }
+  .section-header { text-align:center; margin-bottom:4rem; }
+  .section-label { font-family:'Cinzel',serif; font-size:.65rem; letter-spacing:.45em; color:var(--emerald-light); text-transform:uppercase; display:block; margin-bottom:1rem; }
+  .section-title { font-family:'Cinzel Decorative',serif; font-size:clamp(1.8rem,4vw,2.8rem); font-weight:700; color:var(--gold); margin-bottom:1rem; }
+  .section-line { width:60px; height:2px; background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-dark)); margin:0 auto; }
+  #about { background:linear-gradient(180deg,transparent,rgba(26,74,46,.06) 50%,transparent); }
+  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; }
+  .about-text p { font-size:.95rem; line-height:1.9; color:var(--text-dim); margin-bottom:1.2rem; }
+  .about-text p strong { color:var(--gold); font-weight:500; }
+  .about-stats { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+  .stat-card { border:1px solid rgba(201,168,76,.2); background:rgba(201,168,76,.04); padding:1.5rem; text-align:center; position:relative; transition:border-color .3s,background .3s; }
+  .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0; transition:opacity .3s; }
+  .stat-card:hover { border-color:rgba(201,168,76,.5); background:rgba(201,168,76,.07); }
+  .stat-card:hover::before { opacity:1; }
+  .stat-number { font-family:'Cinzel Decorative',serif; font-size:2.2rem; font-weight:900; color:var(--gold); display:block; }
+  .stat-label { font-family:'Cinzel',serif; font-size:.65rem; letter-spacing:.2em; color:var(--text-dim); text-transform:uppercase; margin-top:.3rem; display:block; }
+  #palmares { background:linear-gradient(180deg,transparent,rgba(8,12,10,.5) 50%,transparent); }
+  .trophy-list { display:flex; flex-direction:column; gap:1.2rem; }
+  .trophy-item { display:flex; align-items:center; gap:1.5rem; padding:1.2rem 1.8rem; border:1px solid rgba(201,168,76,.15); background:rgba(201,168,76,.03); position:relative; overflow:hidden; transition:border-color .3s,background .3s,transform .2s; }
+  .trophy-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--gold); transform:scaleY(0); transform-origin:bottom; transition:transform .3s; }
+  .trophy-item:hover { border-color:rgba(201,168,76,.4); background:rgba(201,168,76,.07); transform:translateX(4px); }
+  .trophy-item:hover::before { transform:scaleY(1); }
+  .trophy-icon { font-size:1.8rem; min-width:40px; text-align:center; }
+  .trophy-info { flex:1; }
+  .trophy-title { font-family:'Cinzel',serif; font-size:.85rem; color:var(--gold); letter-spacing:.05em; }
+  .trophy-desc { font-size:.8rem; color:var(--text-dim); margin-top:.2rem; }
+  .trophy-date { font-family:'Cinzel',serif; font-size:.65rem; color:var(--text-dim); letter-spacing:.1em; white-space:nowrap; }
+  #membres { background:linear-gradient(180deg,transparent,rgba(26,74,46,.06) 50%,transparent); }
+  .members-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1.5rem; }
+  .member-card { border:1px solid rgba(201,168,76,.15); background:rgba(201,168,76,.03); padding:1.8rem 1rem; text-align:center; transition:border-color .3s,background .3s,transform .3s; position:relative; overflow:hidden; }
+  .member-card::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,.08) 0%,transparent 70%); opacity:0; transition:opacity .3s; }
+  .member-card:hover { border-color:rgba(201,168,76,.45); background:rgba(201,168,76,.06); transform:translateY(-4px); }
+  .member-card:hover::after { opacity:1; }
+  .member-avatar { width:64px; height:64px; background:var(--stone); border:2px solid rgba(201,168,76,.3); border-radius:4px; margin:0 auto 1rem; display:flex; align-items:center; justify-content:center; font-size:1.6rem; position:relative; z-index:1; }
+  .member-name { font-family:'Cinzel',serif; font-size:.85rem; color:var(--text); letter-spacing:.05em; position:relative; z-index:1; }
+  .member-role { font-size:.7rem; color:var(--emerald-light); margin-top:.3rem; letter-spacing:.1em; position:relative; z-index:1; }
+  .member-role.leader { color:var(--gold); }
+  .member-role.officer { color:#7ec8e3; }
+  #staff { background:linear-gradient(180deg,transparent,rgba(8,12,10,.5) 50%,transparent); }
+  .staff-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:2rem; }
+  .staff-card { border:1px solid rgba(201,168,76,.2); background:linear-gradient(135deg,rgba(201,168,76,.05) 0%,rgba(26,74,46,.05) 100%); padding:2rem 1.5rem; text-align:center; position:relative; overflow:hidden; transition:transform .3s,box-shadow .3s; }
+  .staff-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+  .staff-card:hover { transform:translateY(-6px); box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 20px rgba(201,168,76,.1); }
+  .staff-avatar { width:72px; height:72px; border:2px solid var(--gold); border-radius:4px; margin:0 auto 1.2rem; display:flex; align-items:center; justify-content:center; font-size:2rem; background:var(--stone); }
+  .staff-name { font-family:'Cinzel',serif; font-size:1rem; color:var(--gold-light); }
+  .staff-role { font-size:.72rem; letter-spacing:.15em; text-transform:uppercase; color:var(--text-dim); margin:.4rem 0 1rem; }
+  .staff-desc { font-size:.8rem; color:var(--text-dim); line-height:1.7; }
+  #recrutement { background:linear-gradient(180deg,transparent,rgba(26,74,46,.06) 50%,transparent); }
+  .recruit-intro { text-align:center; max-width:600px; margin:0 auto 3rem; font-size:.95rem; color:var(--text-dim); line-height:1.8; }
+  .recruit-tabs { display:flex; gap:1rem; justify-content:center; margin-bottom:3rem; flex-wrap:wrap; }
+  .recruit-tab-btn { font-family:'Cinzel',serif; font-size:.72rem; letter-spacing:.15em; text-transform:uppercase; color:var(--text-dim); background:rgba(255,255,255,.03); border:1px solid rgba(201,168,76,.2); padding:.7rem 1.5rem; cursor:pointer; transition:all .2s; }
+  .recruit-tab-btn.active { color:var(--gold); border-color:var(--gold); background:rgba(201,168,76,.08); }
+  .recruit-tab-content { display:none; }
+  .recruit-tab-content.active { display:block; }
+  .recruit-requirements { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1.5rem; margin-bottom:3rem; }
+  .req-item { border:1px solid rgba(201,168,76,.15); background:rgba(201,168,76,.03); padding:1.5rem; display:flex; gap:1rem; align-items:flex-start; transition:border-color .3s; }
+  .req-item:hover { border-color:rgba(201,168,76,.35); background:rgba(201,168,76,.07); }
+  .req-icon { font-size:1.5rem; }
+  .req-text { font-size:.82rem; color:var(--text-dim); line-height:1.6; }
+  .req-text strong { color:var(--gold); display:block; margin-bottom:.2rem; font-size:.85rem; }
+  .staff-req-item { border:1px solid rgba(123,47,255,.2); background:rgba(123,47,255,.04); padding:1.5rem; display:flex; gap:1rem; align-items:flex-start; transition:border-color .3s; }
+  .staff-req-item:hover { border-color:rgba(123,47,255,.4); }
+  .staff-req-item .req-text strong { color:var(--admin-light); }
+  .recruit-status { text-align:center; padding:1.5rem; border:1px solid rgba(45,122,78,.4); background:rgba(45,122,78,.08); margin-bottom:2.5rem; display:flex; align-items:center; justify-content:center; gap:.7rem; }
+  .status-dot { width:8px; height:8px; background:var(--emerald-light); border-radius:50%; animation:pulse-green 2s ease-in-out infinite; }
+  @keyframes pulse-green { 0%,100%{box-shadow:0 0 0 0 rgba(45,122,78,.6)} 50%{box-shadow:0 0 0 8px rgba(45,122,78,0)} }
+  .status-text { font-family:'Cinzel',serif; font-size:.8rem; color:var(--emerald-light); letter-spacing:.1em; }
+  .recruit-form-wrap { max-width:560px; margin:0 auto; }
+  .form-group { margin-bottom:1.2rem; }
+  .form-label { display:block; font-family:'Cinzel',serif; font-size:.65rem; letter-spacing:.2em; color:var(--text-dim); text-transform:uppercase; margin-bottom:.5rem; }
+  .form-input,.form-select,.form-textarea { width:100%; background:rgba(255,255,255,.04); border:1px solid rgba(201,168,76,.2); color:var(--text); font-family:'Raleway',sans-serif; font-size:.9rem; padding:.75rem 1rem; outline:none; transition:border-color .3s,background .3s; }
+  .form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--gold); background:rgba(201,168,76,.06); }
+  .form-select { cursor:pointer; }
+  .form-select option { background:var(--stone); }
+  .form-textarea { resize:vertical; min-height:100px; }
+  .form-submit { width:100%; font-family:'Cinzel',serif; font-size:.8rem; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--black); background:linear-gradient(135deg,var(--gold),var(--gold-light)); border:none; padding:1rem; cursor:pointer; transition:filter .3s,transform .2s; margin-top:.5rem; }
+  .form-submit:hover { filter:brightness(1.1); transform:translateY(-1px); }
+  .form-submit.admin-submit { background:linear-gradient(135deg,var(--admin),var(--admin-light)); color:#fff; }
+  .form-alert { padding:.75rem 1rem; font-size:.8rem; margin-top:1rem; display:none; }
+  .form-alert.success { background:rgba(45,122,78,.15); border:1px solid rgba(45,122,78,.4); color:var(--emerald-light); }
+  .form-alert.error { background:rgba(192,57,43,.15); border:1px solid rgba(192,57,43,.4); color:#e74c3c; }
+  footer { position:relative; z-index:2; border-top:1px solid rgba(201,168,76,.15); text-align:center; padding:2.5rem; }
+  .footer-logo { font-family:'Cinzel Decorative',serif; font-size:1.4rem; color:var(--gold); margin-bottom:.5rem; }
+  .footer-text { font-size:.75rem; color:var(--text-dim); }
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.85); backdrop-filter:blur(8px); z-index:2000; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .3s; }
+  .modal-overlay.open { opacity:1; pointer-events:all; }
+  .modal { background:var(--stone); border:1px solid rgba(201,168,76,.35); border-top:2px solid var(--gold); width:100%; max-width:420px; padding:2.5rem; position:relative; transform:translateY(-20px) scale(.97); transition:transform .3s; }
+  .modal-overlay.open .modal { transform:translateY(0) scale(1); }
+  .modal-close { position:absolute; top:1rem; right:1.2rem; background:none; border:none; color:var(--text-dim); font-size:1.4rem; cursor:pointer; transition:color .2s; }
+  .modal-close:hover { color:var(--gold); }
+  .modal-title { font-family:'Cinzel Decorative',serif; font-size:1.3rem; color:var(--gold); margin-bottom:.4rem; text-align:center; }
+  .modal-subtitle { font-size:.78rem; color:var(--text-dim); text-align:center; margin-bottom:2rem; }
+  .modal-tabs { display:flex; border-bottom:1px solid rgba(201,168,76,.2); margin-bottom:1.8rem; }
+  .modal-tab { flex:1; font-family:'Cinzel',serif; font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; color:var(--text-dim); background:none; border:none; padding:.6rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .2s,border-color .2s; }
+  .modal-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+  .modal-form { display:none; }
+  .modal-form.active { display:block; }
+  .modal-alert { padding:.75rem 1rem; font-size:.8rem; margin-bottom:1rem; display:none; }
+  .modal-alert.success { background:rgba(45,122,78,.15); border:1px solid rgba(45,122,78,.4); color:var(--emerald-light); }
+  .modal-alert.error { background:rgba(192,57,43,.15); border:1px solid rgba(192,57,43,.4); color:#e74c3c; }
+  #adminPanel { display:none; position:fixed; inset:0; z-index:3000; background:rgba(4,6,5,.96); backdrop-filter:blur(16px); overflow-y:auto; }
+  #adminPanel.open { display:block; }
+  .admin-container { max-width:1000px; margin:0 auto; padding:2rem; }
+  .admin-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:2.5rem; padding-bottom:1.5rem; border-bottom:1px solid rgba(123,47,255,.3); flex-wrap:wrap; gap:1rem; }
+  .admin-title { font-family:'Cinzel Decorative',serif; font-size:1.8rem; color:var(--admin-light); }
+  .admin-title span { font-size:.7rem; font-family:'Cinzel',serif; color:var(--text-dim); display:block; letter-spacing:.2em; margin-bottom:.3rem; text-transform:uppercase; }
+  .admin-close { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:var(--text-dim); padding:.5rem 1rem; cursor:pointer; transition:all .2s; font-family:'Cinzel',serif; letter-spacing:.1em; font-size:.75rem; text-transform:uppercase; }
+  .admin-close:hover { border-color:var(--danger); color:var(--danger); }
+  .admin-tabs { display:flex; margin-bottom:2rem; border:1px solid rgba(123,47,255,.3); flex-wrap:wrap; }
+  .admin-tab { flex:1; min-width:120px; font-family:'Cinzel',serif; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); background:transparent; border:none; padding:.9rem .5rem; cursor:pointer; transition:all .2s; border-right:1px solid rgba(123,47,255,.3); }
+  .admin-tab:last-child { border-right:none; }
+  .admin-tab.active { background:rgba(123,47,255,.2); color:var(--admin-light); }
+  .admin-tab:hover:not(.active) { background:rgba(123,47,255,.08); color:var(--text); }
+  .admin-content { display:none; }
+  .admin-content.active { display:block; }
+  .admin-stats-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem; margin-bottom:2.5rem; }
+  .admin-stat { background:rgba(123,47,255,.08); border:1px solid rgba(123,47,255,.25); padding:1.2rem; }
+  .admin-stat-num { font-family:'Cinzel Decorative',serif; font-size:2rem; color:var(--admin-light); }
+  .admin-stat-lbl { font-family:'Cinzel',serif; font-size:.65rem; letter-spacing:.2em; color:var(--text-dim); text-transform:uppercase; margin-top:.2rem; }
+  .applications-list { display:flex; flex-direction:column; gap:1rem; }
+  .app-card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); padding:1.5rem; position:relative; transition:border-color .2s; }
+  .app-card.pending { border-left:3px solid var(--gold); }
+  .app-card.accepted { border-left:3px solid var(--emerald-light); }
+  .app-card.refused { border-left:3px solid var(--danger); }
+  .app-card.staff-type { border-left-color:var(--admin-light) !important; }
+  .app-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.8rem; flex-wrap:wrap; gap:.5rem; }
+  .app-pseudo { font-family:'Cinzel',serif; font-size:.95rem; color:var(--gold); }
+  .app-pseudo.staff-type { color:var(--admin-light); }
+  .app-date { font-family:'Cinzel',serif; font-size:.65rem; color:var(--text-dim); letter-spacing:.08em; }
+  .app-meta { display:flex; gap:1.5rem; margin-bottom:.8rem; flex-wrap:wrap; }
+  .app-meta-item { font-size:.78rem; color:var(--text-dim); }
+  .app-meta-item span { color:var(--text); font-weight:500; }
+  .app-reason { font-size:.82rem; color:var(--text-dim); line-height:1.6; margin-bottom:1rem; font-style:italic; }
+  .app-actions { display:flex; gap:.7rem; flex-wrap:wrap; }
+  .app-btn { font-family:'Cinzel',serif; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; padding:.4rem 1rem; border:1px solid; cursor:pointer; transition:all .2s; }
+  .app-btn.accept { color:var(--emerald-light); border-color:rgba(45,122,78,.5); background:rgba(45,122,78,.1); }
+  .app-btn.accept:hover { background:rgba(45,122,78,.25); }
+  .app-btn.refuse { color:#e74c3c; border-color:rgba(192,57,43,.5); background:rgba(192,57,43,.1); }
+  .app-btn.refuse:hover { background:rgba(192,57,43,.25); }
+  .app-btn.neutral { color:var(--gold); border-color:rgba(201,168,76,.5); background:rgba(201,168,76,.08); }
+  .app-badge { font-family:'Cinzel',serif; font-size:.65rem; letter-spacing:.1em; padding:.25rem .7rem; border-radius:2px; }
+  .badge-pending { background:rgba(201,168,76,.15); color:var(--gold); border:1px solid rgba(201,168,76,.3); }
+  .badge-accepted { background:rgba(45,122,78,.15); color:var(--emerald-light); border:1px solid rgba(45,122,78,.3); }
+  .badge-refused { background:rgba(192,57,43,.15); color:#e74c3c; border:1px solid rgba(192,57,43,.3); }
+  .empty-state { text-align:center; padding:4rem 2rem; color:var(--text-dim); }
+  .empty-icon { font-size:3rem; margin-bottom:1rem; opacity:.4; }
+  .empty-state p { font-family:'Cinzel',serif; font-size:.8rem; letter-spacing:.1em; }
+  .admin-manage-row { display:flex; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+  .admin-manage-row .form-input { flex:1; min-width:140px; }
+  .admin-list { display:flex; flex-direction:column; gap:.6rem; }
+  .admin-list-item { display:flex; justify-content:space-between; align-items:center; padding:.8rem 1.2rem; background:rgba(123,47,255,.07); border:1px solid rgba(123,47,255,.2); flex-wrap:wrap; gap:.5rem; }
+  .admin-list-name { font-family:'Cinzel',serif; font-size:.82rem; color:var(--admin-light); }
+  .admin-list-badge { font-size:.65rem; font-family:'Cinzel',serif; letter-spacing:.1em; padding:.2rem .6rem; background:rgba(123,47,255,.2); border:1px solid rgba(123,47,255,.4); color:var(--admin-light); }
+  .admin-remove-btn { background:none; border:1px solid rgba(192,57,43,.3); color:var(--text-dim); cursor:pointer; font-size:.65rem; transition:all .2s; padding:.2rem .6rem; font-family:'Cinzel',serif; letter-spacing:.1em; }
+  .admin-remove-btn:hover { border-color:var(--danger); color:var(--danger); background:rgba(192,57,43,.1); }
+  .admin-info-box { background:rgba(123,47,255,.06); border:1px solid rgba(123,47,255,.2); padding:1.2rem 1.5rem; margin-bottom:2rem; font-size:.82rem; color:var(--text-dim); line-height:1.7; }
+  .reveal { opacity:0; transform:translateY(24px); transition:opacity .6s,transform .6s; }
+  .reveal.visible { opacity:1; transform:none; }
+  @media (max-width:768px) { .about-grid{grid-template-columns:1fr} .nav-btn{padding:.5rem .4rem;font-size:.62rem} .admin-tabs{flex-wrap:wrap} }
+</style>
+
+<!-- ══ FIREBASE (doit être dans le <head>, AVANT </head>) ══ -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy }
@@ -11,30 +245,604 @@
     projectId: "lgf-faction",
     storageBucket: "lgf-faction.firebasestorage.app",
     messagingSenderId: "197055213297",
-    appId: "1:197055213297:web:c6b84053cb2f61d214c350",
-    measurementId: "G-NBJCJ5F88G"
+    appId: "1:197055213297:web:c6b84053cb2f61d214c350"
   };
 
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  window._db = db;
-  window._col = collection;
-  window._addDoc = addDoc;
-  window._onSnapshot = onSnapshot;
-  window._doc = doc;
-  window._updateDoc = updateDoc;
-  window._query = query;
-  window._orderBy = orderBy;
-  window._firebaseReady = true;
-  window.dispatchEvent(new Event('firebaseReady'));
+  const db  = getFirestore(app);
+
+  window._db          = db;
+  window._col         = collection;
+  window._addDoc      = addDoc;
+  window._onSnapshot  = onSnapshot;
+  window._doc         = doc;
+  window._updateDoc   = updateDoc;
+  window._query       = query;
+  window._orderBy     = orderBy;
+
+  // Prévient le reste de la page que Firebase est prêt
+  window.addEventListener('DOMContentLoaded', () => {
+    window.dispatchEvent(new Event('firebaseReady'));
+  });
 </script>
 </head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LGF — La Guilde des Factions</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
+<body>
+<div id="particles"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo" onclick="goTo('home')">LGF</div>
+    <ul class="nav-links">
+      <li><button class="nav-btn" onclick="goTo('home')">Home</button></li>
+      <li class="has-dropdown">
+        <button class="nav-btn">Summary</button>
+        <div class="dropdown">
+          <a onclick="goTo('about')">⚔ Who We Are?</a>
+          <a onclick="goTo('palmares')">🏆 Wins Logs</a>
+          <a onclick="goTo('membres')">👥 Members</a>
+          <a onclick="goTo('staff')">🛡 Staff</a>
+          <a onclick="goTo('recrutement')">📜 Recruitment</a>
+        </div>
+      </li>
+      <li><button class="nav-admin-btn" id="navAdminBtn" onclick="openAdmin()">⚙ Admin</button></li>
+      <li>
+        <div class="nav-user" id="navUser">
+          <div class="nav-user-avatar">⚔</div>
+          <span id="navUsername">Player</span>
+          <button class="nav-logout" onclick="logout()">Disconnect</button>
+        </div>
+      </li>
+      <li><button class="nav-login" id="navLoginBtn" onclick="openModal()">Login</button></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-emblem"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">⚔ Minecraft — Faction PvP ⚔</div>
+    <h1 class="hero-title">LGF</h1>
+    <p class="hero-subtitle">Website</p>
+    <div class="hero-divider"></div>
+    <p class="hero-tagline">An ELITE Faction. Wars, Builds, Farms — We are the best in every domain.</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="goTo('recrutement')">Join faction</button>
+      <button class="btn-secondary" onclick="goTo('about')">More informations</button>
+    </div>
+  </div>
+  <div class="scroll-indicator"><span>Scroll</span><div class="scroll-arrow"></div></div>
+</section>
+
+<!-- WHO WE ARE -->
+<section id="about">
+  <div class="section-container">
+    <div class="section-header reveal"><span class="section-label">Our History</span><h2 class="section-title">Who We Are?</h2><div class="section-line"></div></div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>The <strong>LGF</strong> was born from a simple vision: gather the best players in one team.</p>
+        <p>Our philosophy is "be excellent": every member is selected for their <strong>combat skills</strong>, team spirit and loyalty.</p>
+        <p>LGF has been through many epic wars. Our reputation speaks for itself: <strong>respect & fear</strong>.</p>
+      </div>
+      <div class="about-stats reveal">
+        <div class="stat-card"><span class="stat-number" data-target="6">0</span><span class="stat-label">Active Members</span></div>
+        <div class="stat-card"><span class="stat-number" data-target="20">0</span><span class="stat-label">Wars Won</span></div>
+        <div class="stat-card"><span class="stat-number" data-target="7">0</span><span class="stat-label">Seasons Played</span></div>
+        <div class="stat-card"><span class="stat-number" data-target="4">0</span><span class="stat-label">Titles Won</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WINS LOGS -->
+<section id="palmares">
+  <div class="section-container">
+    <div class="section-header reveal"><span class="section-label">Wins</span><h2 class="section-title">Wins Logs</h2><div class="section-line"></div></div>
+    <div class="trophy-list">
+      <div class="trophy-item reveal"><div class="trophy-icon">🥇</div><div class="trophy-info"><div class="trophy-title">Champions on the 2 latest versions of Azuria</div><div class="trophy-desc">Earned cashprize for this achievement</div></div><div class="trophy-date"></div></div>
+      <div class="trophy-item reveal"><div class="trophy-icon">⚔️</div><div class="trophy-info"><div class="trophy-title">Champions of Rakass V1 & V2</div><div class="trophy-desc">Major in many rankings</div></div><div class="trophy-date"></div></div>
+      <div class="trophy-item reveal"><div class="trophy-icon">🏰</div><div class="trophy-info"><div class="trophy-title">Best Anti-Raid & Anti-Chorus bases</div><div class="trophy-desc">Innovative & strong bases</div></div><div class="trophy-date"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MEMBERS -->
+<section id="membres">
+  <div class="section-container">
+    <div class="section-header reveal"><span class="section-label">Community</span><h2 class="section-title">Members</h2><div class="section-line"></div></div>
+    <div class="members-grid" id="membersGrid"></div>
+  </div>
+</section>
+
+<!-- STAFF -->
+<section id="staff">
+  <div class="section-container">
+    <div class="section-header reveal"><span class="section-label">Staff Team</span><h2 class="section-title">Staff</h2><div class="section-line"></div></div>
+    <div class="staff-grid" id="staffGrid"></div>
+  </div>
+</section>
+
+<!-- RECRUITMENT -->
+<section id="recrutement">
+  <div class="section-container">
+    <div class="section-header reveal"><span class="section-label">Join Us</span><h2 class="section-title">Recruitment</h2><div class="section-line"></div></div>
+    <div class="recruit-tabs reveal">
+      <button class="recruit-tab-btn active" onclick="switchRecruitTab('faction')">⚔ Faction</button>
+      <button class="recruit-tab-btn" onclick="switchRecruitTab('staff')">🛡 Staff</button>
+    </div>
+
+    <!-- FACTION -->
+    <div class="recruit-tab-content active" id="recruitTabFaction">
+      <p class="recruit-intro">Think you're good enough? Try to join us.</p>
+      <div class="recruit-requirements">
+        <div class="req-item reveal"><div class="req-icon">⚔️</div><div class="req-text"><strong>PvP Player</strong>Strong in PvP fights and faction battles.</div></div>
+        <div class="req-item reveal"><div class="req-icon">🕐</div><div class="req-text"><strong>Availability</strong>10h per week minimum.</div></div>
+        <div class="req-item reveal"><div class="req-icon">🎙️</div><div class="req-text"><strong>Discord Account</strong>Mandatory presence on Discord.</div></div>
+        <div class="req-item reveal"><div class="req-icon">🛡️</div><div class="req-text"><strong>Chill</strong>Zero trash-talk in the LGF.</div></div>
+      </div>
+      <div class="recruit-status reveal"><div class="status-dot"></div><span class="status-text">Recruitment open — Limited spots</span></div>
+      <div class="recruit-form-wrap reveal">
+        <div class="form-group"><label class="form-label">Minecraft Username *</label><input class="form-input" type="text" id="rPseudo" placeholder="GamerTag2026"></div>
+        <div class="form-group"><label class="form-label">Age *</label><input class="form-input" type="number" id="rAge" placeholder="16" min="12" max="99"></div>
+        <div class="form-group"><label class="form-label">Speciality *</label>
+          <select class="form-select" id="rSpecialty"><option value="">— Choose —</option><option>PvP Player</option><option>Builder</option><option>Farmer</option><option>Strat Player</option><option>Multifunction</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Hours per week *</label>
+          <select class="form-select" id="rHours"><option value="">— Choose —</option><option>10–20h</option><option>20–30h</option><option>30h+</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Why join LGF?</label><textarea class="form-textarea" id="rReason" placeholder="Give your reasons..."></textarea></div>
+        <button class="form-submit" onclick="submitFactionApp()">Send Application</button>
+        <div class="form-alert" id="factionAlert"></div>
+      </div>
+    </div>
+
+    <!-- STAFF -->
+    <div class="recruit-tab-content" id="recruitTabStaff">
+      <p class="recruit-intro">Join the leadership team! We are looking for experienced and committed players to strengthen our staff.</p>
+      <div class="recruit-requirements" style="margin-bottom:3rem;">
+        <div class="staff-req-item reveal"><div class="req-icon">👑</div><div class="req-text"><strong>Seniority</strong>Minimum 1 month in faction or on the server.</div></div>
+        <div class="staff-req-item reveal"><div class="req-icon">🧠</div><div class="req-text"><strong>Leadership</strong>Ability to lead and motivate.</div></div>
+        <div class="staff-req-item reveal"><div class="req-icon">⏰</div><div class="req-text"><strong>Strong commitment</strong>Minimum 20h/week.</div></div>
+        <div class="staff-req-item reveal"><div class="req-icon">🎙️</div><div class="req-text"><strong>Communication</strong>Excellent Discord management.</div></div>
+      </div>
+      <div class="recruit-form-wrap reveal">
+        <div class="form-group"><label class="form-label">Minecraft Username *</label><input class="form-input" type="text" id="sPseudo" placeholder="GamerTag2026"></div>
+        <div class="form-group"><label class="form-label">Age *</label><input class="form-input" type="number" id="sAge" placeholder="18" min="14" max="99"></div>
+        <div class="form-group"><label class="form-label">Desired position *</label>
+          <select class="form-select" id="sPost"><option value="">— Choose —</option><option>Officer</option><option>Recruitment Manager</option><option>Economy Manager</option><option>Defense Manager</option><option>War Chief</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Faction management experience</label><textarea class="form-textarea" id="sExperience" placeholder="Describe your experience..."></textarea></div>
+        <div class="form-group"><label class="form-label">Motivation *</label><textarea class="form-textarea" id="sMotivation" placeholder="Why do you want to join the LGF staff?"></textarea></div>
+        <button class="form-submit admin-submit" onclick="submitStaffApp()">Submit Staff Application</button>
+        <div class="form-alert" id="staffAppAlert"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">LGF</div>
+  <p class="footer-text">© 2024 LGF — All rights reserved · Minecraft Faction Server</p>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">LGF</div>
+    <div class="modal-subtitle">Member Area</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab('login')">Login</button>
+      <button class="modal-tab" onclick="switchTab('register')">Register</button>
+    </div>
+    <div class="modal-form active" id="formLogin">
+      <div class="modal-alert" id="loginAlert"></div>
+      <div class="form-group"><label class="form-label">Minecraft Username</label><input class="form-input" type="text" id="loginUser" placeholder="YourUsername" autocomplete="username"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="form-submit" onclick="doLogin()">Log In</button>
+    </div>
+    <div class="modal-form" id="formRegister">
+      <div class="modal-alert" id="registerAlert"></div>
+      <div class="form-group"><label class="form-label">Minecraft Username</label><input class="form-input" type="text" id="regUser" placeholder="YourUsername"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="regPass" placeholder="Minimum 6 characters"></div>
+      <div class="form-group"><label class="form-label">Confirm</label><input class="form-input" type="password" id="regPassConfirm" placeholder="Repeat" onkeydown="if(event.key==='Enter')doRegister()"></div>
+      <button class="form-submit" onclick="doRegister()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+  <div class="admin-container">
+    <div class="admin-header">
+      <div class="admin-title"><span>⚙ Administration Panel</span>LGF Admin</div>
+      <button class="admin-close" onclick="closeAdmin()">✕ Close Panel</button>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchAdminTab('dashboard')">📊 Dashboard</button>
+      <button class="admin-tab" onclick="switchAdminTab('faction-apps')">⚔ Faction Apps</button>
+      <button class="admin-tab" onclick="switchAdminTab('staff-apps')">🛡 Staff Apps</button>
+      <button class="admin-tab" onclick="switchAdminTab('admins')">👑 Manage Admins</button>
+    </div>
+    <div class="admin-content active" id="adminDashboard">
+      <div class="admin-stats-row" id="adminStatsRow"></div>
+      <h3 style="font-family:'Cinzel',serif;color:var(--text-dim);font-size:.75rem;letter-spacing:.2em;margin-bottom:1rem;text-transform:uppercase;">Latest applications received</h3>
+      <div class="applications-list" id="adminRecentList"></div>
+    </div>
+    <div class="admin-content" id="adminFactionApps">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <h3 style="font-family:'Cinzel',serif;color:var(--gold);font-size:.85rem;letter-spacing:.15em;text-transform:uppercase;">Faction Applications</h3>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+          <button class="app-btn neutral" onclick="filterApps('faction','all')">All</button>
+          <button class="app-btn neutral" onclick="filterApps('faction','pending')">Pending</button>
+          <button class="app-btn accept" onclick="filterApps('faction','accepted')">Accepted</button>
+          <button class="app-btn refuse" onclick="filterApps('faction','refused')">Refused</button>
+        </div>
+      </div>
+      <div class="applications-list" id="factionAppsList"></div>
+    </div>
+    <div class="admin-content" id="adminStaffApps">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <h3 style="font-family:'Cinzel',serif;color:var(--admin-light);font-size:.85rem;letter-spacing:.15em;text-transform:uppercase;">Staff Applications</h3>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+          <button class="app-btn neutral" onclick="filterApps('staff','all')">All</button>
+          <button class="app-btn neutral" onclick="filterApps('staff','pending')">Pending</button>
+          <button class="app-btn accept" onclick="filterApps('staff','accepted')">Accepted</button>
+          <button class="app-btn refuse" onclick="filterApps('staff','refused')">Refused</button>
+        </div>
+      </div>
+      <div class="applications-list" id="staffAppsList"></div>
+    </div>
+    <div class="admin-content" id="adminAdmins">
+      <h3 style="font-family:'Cinzel',serif;color:var(--admin-light);font-size:.85rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.5rem;">Admin Accounts</h3>
+      <div class="admin-info-box">⚠ Admins have access to the administration panel and can view and process all applications. Only add trusted people. Only the <strong style="color:var(--admin-light)">Super Admin</strong> can add or remove admins.</div>
+      <div class="admin-manage-row">
+        <input class="form-input" type="text" id="newAdminUser" placeholder="Minecraft Username">
+        <input class="form-input" type="password" id="newAdminPass" placeholder="Password (min. 6 chars)">
+        <button class="form-submit admin-submit" onclick="addAdmin()" style="width:auto;padding:.75rem 1.5rem;margin:0;">+ Add</button>
+      </div>
+      <div class="form-alert" id="adminManageAlert"></div>
+      <div class="admin-list" id="adminList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───
+const MEMBERS = [
+  {name:'KsOuLeT',     role:'Owner',         icon:'👑', type:'leader'},
+  {name:'LaRakLeTTe',  role:'Co-Owner',       icon:'⚔️', type:'leader'},
+  {name:'S4PHIR',      role:'Staff Manager',  icon:'🛡️', type:'officer'},
+  {name:'GroutArmi8',  role:'Player ++',      icon:'🏹', type:'officer'},
+  {name:'Twelve12',    role:'Player ++',      icon:'🏹', type:'officer'},
+  {name:'MisterRasta', role:'Friend / VIP',   icon:'💎', type:'member'},
+  {name:'S4PHIR',      role:'Developer',      icon:'💻', type:'recruit'},
+];
+const STAFF_LIST = [
+  {name:'KsOuLeT',    role:'Founder & Owner',       desc:'Founder of LGF.',                         icon:'👑'},
+  {name:'LaRakLeTTe', role:'Co-Owner & War Chief',   desc:'Leadership of the faction.',              icon:'⚔️'},
+  {name:'S4PHIR',     role:'Staff Manager',          desc:'Manages the staff like no one else.',     icon:'🛡️'},
+];
+
+// ─── AUTH ───
+const AUTH = {
+  'admin':      {pass:'lgf2024',  isAdmin:true, isSuperAdmin:true},
+  'KsOuLeT':   {pass:'faction',  isAdmin:true, isSuperAdmin:false},
+};
+const regularUsers = {};
+let currentUser = null;
+
+// ─── APPS (remplis par Firebase en temps réel) ───
+let factionApps = [];
+let staffApps   = [];
+
+// ─── DISCORD WEBHOOK ───
+const DISCORD_WEBHOOK = ''; // ← Colle ton URL webhook ici si tu en as un
+
+function sendDiscordNotif(app) {
+  if (!DISCORD_WEBHOOK) return;
+  const isStaff = app.type === 'staff';
+  const fields = isStaff ? [
+    {name:'🛡 Position', value:app.post, inline:true},
+    {name:'🎂 Age', value:app.age+' ans', inline:true},
+    {name:'💬 Motivation', value:app.motivation}
+  ] : [
+    {name:'⚔ Speciality', value:app.specialty, inline:true},
+    {name:'🕐 Availability', value:app.hours, inline:true},
+    {name:'🎂 Age', value:app.age+' ans', inline:true},
+    {name:'💬 Reason', value:app.reason}
+  ];
+  fetch(DISCORD_WEBHOOK, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({embeds:[{
+      title: isStaff ? '🛡 New Staff Application' : '⚔ New Faction Application',
+      description:`**${app.pseudo}** just submitted an application.`,
+      color: isStaff ? 7352319 : 13281356,
+      fields,
+      footer:{text:'LGF — '+app.date}
+    }]})
+  }).catch(()=>{});
+}
+
+// ─── UTILS ───
+function now() {
+  return new Date().toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+// ─── RENDER ───
+function renderMembers() {
+  document.getElementById('membersGrid').innerHTML = MEMBERS.map(m =>
+    `<div class="member-card reveal"><div class="member-avatar">${m.icon}</div><div class="member-name">${m.name}</div><div class="member-role ${m.type}">${m.role}</div></div>`
+  ).join('');
+}
+function renderStaff() {
+  document.getElementById('staffGrid').innerHTML = STAFF_LIST.map(s =>
+    `<div class="staff-card reveal"><div class="staff-avatar">${s.icon}</div><div class="staff-name">${s.name}</div><div class="staff-role">${s.role}</div><div class="staff-desc">${s.desc}</div></div>`
+  ).join('');
+}
+
+// ─── PARTICLES ───
+function createParticles() {
+  const c = document.getElementById('particles');
+  for (let i=0;i<30;i++) {
+    const p = document.createElement('div'); p.className='particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.animationDuration=(8+Math.random()*15)+'s';
+    p.style.animationDelay=(Math.random()*10)+'s';
+    p.style.width=p.style.height=(1+Math.random()*2)+'px';
+    c.appendChild(p);
+  }
+}
+
+// ─── SCROLL ───
+function goTo(id) { document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+function checkReveal() {
+  document.querySelectorAll('.reveal').forEach(el => {
+    if (el.getBoundingClientRect().top < window.innerHeight-60) el.classList.add('visible');
+  });
+}
+function animateCounters() {
+  document.querySelectorAll('[data-target]').forEach(el => {
+    if (el.getBoundingClientRect().top < window.innerHeight && !el.dataset.animated) {
+      el.dataset.animated='1';
+      const target=parseInt(el.dataset.target); let cur=0;
+      const t=setInterval(()=>{ cur=Math.min(cur+target/50,target); el.textContent=Math.floor(cur); if(cur>=target)clearInterval(t); },30);
+    }
+  });
+}
+window.addEventListener('scroll', ()=>{ checkReveal(); animateCounters(); });
+
+// ─── LOGIN MODAL ───
+function openModal()  { document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModalOutside(e) { if(e.target.id==='modalOverlay') closeModal(); }
+function switchTab(tab) {
+  document.querySelectorAll('.modal-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('formLogin').classList.toggle('active',tab==='login');
+  document.getElementById('formRegister').classList.toggle('active',tab==='register');
+}
+function showModalAlert(id,msg,type) {
+  const el=document.getElementById(id); el.textContent=msg; el.className='modal-alert '+type; el.style.display='block';
+  setTimeout(()=>el.style.display='none',4000);
+}
+function doLogin() {
+  const user=document.getElementById('loginUser').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  if(!user||!pass) return showModalAlert('loginAlert','Fill in all fields.','error');
+  if(AUTH[user]&&AUTH[user].pass===pass) { setLoggedIn(user,true); closeModal(); }
+  else if(regularUsers[user]===pass)     { setLoggedIn(user,false); closeModal(); }
+  else showModalAlert('loginAlert','Incorrect username or password.','error');
+}
+function doRegister() {
+  const user=document.getElementById('regUser').value.trim();
+  const pass=document.getElementById('regPass').value;
+  const confirm=document.getElementById('regPassConfirm').value;
+  if(!user||!pass) return showModalAlert('registerAlert','Fill in all fields.','error');
+  if(pass.length<6) return showModalAlert('registerAlert','Password too short (min. 6 chars).','error');
+  if(pass!==confirm) return showModalAlert('registerAlert','Passwords do not match.','error');
+  if(AUTH[user]||regularUsers[user]) return showModalAlert('registerAlert','This username is already taken.','error');
+  regularUsers[user]=pass;
+  showModalAlert('registerAlert','✅ Account created! You can now log in.','success');
+  setTimeout(()=>switchTab('login'),1800);
+}
+function setLoggedIn(username,isAdmin) {
+  currentUser=username;
+  document.getElementById('navUser').classList.add('visible');
+  document.getElementById('navUsername').textContent=username;
+  document.getElementById('navLoginBtn').style.display='none';
+  document.getElementById('navAdminBtn').classList.toggle('visible',isAdmin);
+}
+function logout() {
+  currentUser=null;
+  document.getElementById('navUser').classList.remove('visible');
+  document.getElementById('navLoginBtn').style.display='';
+  document.getElementById('navAdminBtn').classList.remove('visible');
+}
+
+// ─── RECRUIT TABS ───
+function switchRecruitTab(tab) {
+  document.querySelectorAll('.recruit-tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='faction')||(i===1&&tab==='staff')));
+  document.getElementById('recruitTabFaction').classList.toggle('active',tab==='faction');
+  document.getElementById('recruitTabStaff').classList.toggle('active',tab==='staff');
+}
+
+// ─── FORM ALERTS ───
+function showFormAlert(id,msg,type) {
+  const el=document.getElementById(id); el.textContent=msg; el.className='form-alert '+type; el.style.display='block';
+  setTimeout(()=>el.style.display='none',5000);
+}
+
+// ─── SUBMIT FACTION ───
+async function submitFactionApp() {
+  const pseudo    = document.getElementById('rPseudo').value.trim();
+  const age       = document.getElementById('rAge').value;
+  const specialty = document.getElementById('rSpecialty').value;
+  const hours     = document.getElementById('rHours').value;
+  const reason    = document.getElementById('rReason').value.trim();
+  if(!pseudo||!age||!specialty||!hours) return showFormAlert('factionAlert','Please fill in all required fields (*).','error');
+
+  const app = {type:'faction', pseudo, age, specialty, hours, reason:reason||'(not specified)', status:'pending', date:now(), createdAt:Date.now()};
+  await window._addDoc(window._col(window._db,'applications'), app);
+  sendDiscordNotif(app);
+  showFormAlert('factionAlert',`✅ Application from "${pseudo}" sent! The staff will contact you within 48h.`,'success');
+  ['rPseudo','rAge','rSpecialty','rHours','rReason'].forEach(id=>document.getElementById(id).value='');
+}
+
+// ─── SUBMIT STAFF ───
+async function submitStaffApp() {
+  const pseudo     = document.getElementById('sPseudo').value.trim();
+  const age        = document.getElementById('sAge').value;
+  const post       = document.getElementById('sPost').value;
+  const motivation = document.getElementById('sMotivation').value.trim();
+  const experience = document.getElementById('sExperience').value.trim();
+  if(!pseudo||!age||!post||!motivation) return showFormAlert('staffAppAlert','Please fill in all required fields (*).','error');
+
+  const app = {type:'staff', pseudo, age, post, motivation, experience:experience||'(not specified)', status:'pending', date:now(), createdAt:Date.now()};
+  await window._addDoc(window._col(window._db,'applications'), app);
+  sendDiscordNotif(app);
+  showFormAlert('staffAppAlert',`✅ Staff application from "${pseudo}" sent!`,'success');
+  ['sPseudo','sAge','sPost','sMotivation','sExperience'].forEach(id=>document.getElementById(id).value='');
+}
+
+// ─── ADMIN PANEL ───
+function openAdmin() {
+  if(!currentUser||!AUTH[currentUser]) return;
+  renderAdminDashboard();
+  renderFactionApps('all');
+  renderStaffApps('all');
+  renderAdminList();
+  document.getElementById('adminPanel').classList.add('open');
+}
+function closeAdmin() { document.getElementById('adminPanel').classList.remove('open'); }
+
+function switchAdminTab(tab) {
+  const keys=['dashboard','faction-apps','staff-apps','admins'];
+  const ids=['adminDashboard','adminFactionApps','adminStaffApps','adminAdmins'];
+  document.querySelectorAll('.admin-tab').forEach((t,i)=>t.classList.toggle('active',keys[i]===tab));
+  ids.forEach((id,i)=>document.getElementById(id).classList.toggle('active',keys[i]===tab));
+}
+
+function renderAdminDashboard() {
+  const pf=factionApps.filter(a=>a.status==='pending').length;
+  const ps=staffApps.filter(a=>a.status==='pending').length;
+  document.getElementById('adminStatsRow').innerHTML=`
+    <div class="admin-stat"><div class="admin-stat-num">${factionApps.length}</div><div class="admin-stat-lbl">Faction Apps</div></div>
+    <div class="admin-stat"><div class="admin-stat-num">${staffApps.length}</div><div class="admin-stat-lbl">Staff Apps</div></div>
+    <div class="admin-stat"><div class="admin-stat-num">${pf+ps}</div><div class="admin-stat-lbl">Pending</div></div>
+    <div class="admin-stat"><div class="admin-stat-num">${Object.keys(AUTH).length}</div><div class="admin-stat-lbl">Active Admins</div></div>`;
+  const recent=[...factionApps,...staffApps].sort((a,b)=>b.createdAt-a.createdAt).slice(0,5);
+  document.getElementById('adminRecentList').innerHTML=recent.length?recent.map(buildAppCard).join(''):emptyState('No applications received yet.');
+}
+
+function renderFactionApps(filter) {
+  const list=filter==='all'?factionApps:factionApps.filter(a=>a.status===filter);
+  document.getElementById('factionAppsList').innerHTML=list.length?list.map(buildAppCard).join(''):emptyState('No applications in this category.');
+}
+function renderStaffApps(filter) {
+  const list=filter==='all'?staffApps:staffApps.filter(a=>a.status===filter);
+  document.getElementById('staffAppsList').innerHTML=list.length?list.map(buildAppCard).join(''):emptyState('No applications in this category.');
+}
+function filterApps(type,filter) {
+  if(type==='faction') renderFactionApps(filter);
+  else renderStaffApps(filter);
+}
+
+function buildAppCard(app) {
+  const isStaff=app.type==='staff';
+  const badges={
+    pending: '<span class="app-badge badge-pending">⏳ Pending</span>',
+    accepted:'<span class="app-badge badge-accepted">✅ Accepted</span>',
+    refused: '<span class="app-badge badge-refused">❌ Refused</span>'
+  };
+  const meta=isStaff
+    ?`<div class="app-meta-item">Position: <span>${app.post}</span></div><div class="app-meta-item">Age: <span>${app.age}</span></div>`
+    :`<div class="app-meta-item">Speciality: <span>${app.specialty}</span></div><div class="app-meta-item">Hours: <span>${app.hours}</span></div><div class="app-meta-item">Age: <span>${app.age}</span></div>`;
+  const quote=isStaff?app.motivation:app.reason;
+  const actions=app.status==='pending'
+    ?`<button class="app-btn accept" onclick="updateApp('${app.id}','accepted')">✅ Accept</button><button class="app-btn refuse" onclick="updateApp('${app.id}','refused')">❌ Refuse</button>`
+    :`<button class="app-btn neutral" onclick="updateApp('${app.id}','pending')">↩ Set back to pending</button>`;
+  return `<div class="app-card ${app.status}${isStaff?' staff-type':''}">
+    <div class="app-card-header">
+      <div class="app-pseudo${isStaff?' staff-type':''}">${isStaff?'🛡':'⚔'} ${app.pseudo}</div>
+      <div style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;">${badges[app.status]}<div class="app-date">${app.date}</div></div>
+    </div>
+    <div class="app-meta">${meta}</div>
+    ${quote?`<div class="app-reason">"${quote}"</div>`:''}
+    <div class="app-actions">${actions}</div>
+  </div>`;
+}
+
+function emptyState(msg) {
+  return `<div class="empty-state"><div class="empty-icon">📭</div><p>${msg}</p></div>`;
+}
+
+async function updateApp(id, status) {
+  await window._updateDoc(window._doc(window._db,'applications',id),{status});
+}
+
+// ─── ADMIN MANAGEMENT ───
+function renderAdminList() {
+  const isSA=AUTH[currentUser]?.isSuperAdmin;
+  document.getElementById('adminList').innerHTML=Object.entries(AUTH).map(([name,data])=>`
+    <div class="admin-list-item">
+      <div style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;">
+        <div class="admin-list-name">👤 ${name}</div>
+        <span class="admin-list-badge">${data.isSuperAdmin?'Super Admin':'Admin'}</span>
+      </div>
+      ${isSA&&!data.isSuperAdmin?`<button class="admin-remove-btn" onclick="removeAdmin('${name}')">✕ Remove</button>`:'<span style="font-size:.65rem;color:var(--text-dim);font-family:Cinzel,serif;letter-spacing:.1em;">Protected</span>'}
+    </div>`).join('');
+}
+function addAdmin() {
+  if(!AUTH[currentUser]?.isSuperAdmin) return;
+  const user=document.getElementById('newAdminUser').value.trim();
+  const pass=document.getElementById('newAdminPass').value;
+  const alertEl=document.getElementById('adminManageAlert');
+  if(!user||!pass){alertEl.textContent='Fill in username and password.';alertEl.className='form-alert error';alertEl.style.display='block';return;}
+  if(pass.length<6){alertEl.textContent='Password too short (min. 6 chars).';alertEl.className='form-alert error';alertEl.style.display='block';return;}
+  if(AUTH[user]){alertEl.textContent='This username is already an admin.';alertEl.className='form-alert error';alertEl.style.display='block';return;}
+  AUTH[user]={pass,isAdmin:true,isSuperAdmin:false};
+  document.getElementById('newAdminUser').value=''; document.getElementById('newAdminPass').value='';
+  alertEl.textContent=`✅ ${user} added as admin.`;alertEl.className='form-alert success';alertEl.style.display='block';
+  setTimeout(()=>alertEl.style.display='none',4000);
+  renderAdminList(); renderAdminDashboard();
+}
+function removeAdmin(name) {
+  if(!AUTH[currentUser]?.isSuperAdmin||AUTH[name]?.isSuperAdmin) return;
+  delete AUTH[name];
+  renderAdminList(); renderAdminDashboard();
+}
+
+// ─── INIT ───
+renderMembers(); renderStaff(); createParticles();
+setTimeout(checkReveal,100); setTimeout(animateCounters,500);
+
+// ─── FIREBASE LISTENER (temps réel) ───
+window.addEventListener('firebaseReady', () => {
+  const q = window._query(
+    window._col(window._db,'applications'),
+    window._orderBy('createdAt','desc')
+  );
+  window._onSnapshot(q, (snapshot) => {
+    factionApps = [];
+    staffApps   = [];
+    snapshot.forEach(docSnap => {
+      const data = { ...docSnap.data(), id: docSnap.id };
+      if(data.type==='faction') factionApps.push(data);
+      else staffApps.push(data);
+    });
+    // Rafraîchit le panel admin si ouvert
+    if(document.getElementById('adminPanel').classList.contains('open')) {
+      renderAdminDashboard();
+      renderFactionApps('all');
+      renderStaffApps('all');
+    }
+  });
+});
+</script>
+</body>
+</html>  :root {
     --gold: #c9a84c; --gold-light: #f0d080; --gold-dark: #8b6914;
     --emerald: #1a4a2e; --emerald-light: #2d7a4e; --emerald-dark: #0d2418;
     --black: #080c0a; --stone: #1c1f1d; --stone-light: #2a2e2b;
