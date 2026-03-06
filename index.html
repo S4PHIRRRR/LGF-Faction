@@ -236,7 +236,7 @@
 <!-- ══ FIREBASE (doit être dans le <head>, AVANT </head>) ══ -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy }
+  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deletedoc, setdoc, query, orderBy }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -257,6 +257,8 @@
   window._onSnapshot  = onSnapshot;
   window._doc         = doc;
   window._updateDoc   = updateDoc;
+  window._updateDoc   = updateDoc;
+  window._setDoc      = setDoc;
   window._query       = query;
   window._orderBy     = orderBy;
 
@@ -795,7 +797,7 @@ function renderAdminList() {
       ${isSA&&!data.isSuperAdmin?`<button class="admin-remove-btn" onclick="removeAdmin('${name}')">✕ Remove</button>`:'<span style="font-size:.65rem;color:var(--text-dim);font-family:Cinzel,serif;letter-spacing:.1em;">Protected</span>'}
     </div>`).join('');
 }
-function addAdmin() {
+async function addAdmin() {
   if(!AUTH[currentUser]?.isSuperAdmin) return;
   const user=document.getElementById('newAdminUser').value.trim();
   const pass=document.getElementById('newAdminPass').value;
@@ -803,14 +805,17 @@ function addAdmin() {
   if(!user||!pass){alertEl.textContent='Fill in username and password.';alertEl.className='form-alert error';alertEl.style.display='block';return;}
   if(pass.length<6){alertEl.textContent='Password too short (min. 6 chars).';alertEl.className='form-alert error';alertEl.style.display='block';return;}
   if(AUTH[user]){alertEl.textContent='This username is already an admin.';alertEl.className='form-alert error';alertEl.style.display='block';return;}
+  // sauvegarde dans FireBase
+  await window._setDoc(window._doc(window._db,'admins',user), {pass, isAdmin:true, isSuperAdmin:false});
   AUTH[user]={pass,isAdmin:true,isSuperAdmin:false};
-  document.getElementById('newAdminUser').value=''; document.getElementById('newAdminPass').value='';
-  alertEl.textContent=`✅ ${user} added as admin.`;alertEl.className='form-alert success';alertEl.style.display='block';
+  document.getElementById('newAdminUser').value=''; document.getElementById('newAdminUser').value='';
+  alertEl.textcontent=`✅ ${user} added as admin.`; alerEl.className='form-alert success'; alertEl.style.display='block';
   setTimeout(()=>alertEl.style.display='none',4000);
-  renderAdminList(); renderAdminDashboard();
+  renderAdminList();  renderAdminDashboard();
 }
-function removeAdmin(name) {
+async function removeAdmin(name) {
   if(!AUTH[currentUser]?.isSuperAdmin||AUTH[name]?.isSuperAdmin) return;
+  await window._deleteDoc(window._doc(window._db,'admins', name));
   delete AUTH[name];
   renderAdminList(); renderAdminDashboard();
 }
@@ -821,6 +826,8 @@ setTimeout(checkReveal,100); setTimeout(animateCounters,500);
 
 // ─── FIREBASE LISTENER (temps réel) ───
 window.addEventListener('firebaseReady', () => {
+
+  // Écoute les candidatures
   const q = window._query(
     window._col(window._db,'applications'),
     window._orderBy('createdAt','desc')
@@ -833,14 +840,36 @@ window.addEventListener('firebaseReady', () => {
       if(data.type==='faction') factionApps.push(data);
       else staffApps.push(data);
     });
-    // Rafraîchit le panel admin si ouvert
     if(document.getElementById('adminPanel').classList.contains('open')) {
       renderAdminDashboard();
       renderFactionApps('all');
       renderStaffApps('all');
     }
   });
+
+  // Écoute les admins
+  window._onSnapshot(window._col(window._db,'admins'), (snapshot) => {
+    snapshot.forEach(docSnap => {
+      const data = docSnap.data();
+      const name = docSnap.id;
+      // Ne pas écraser les super admins définis en dur
+      if(!AUTH[name]?.isSuperAdmin) {
+        AUTH[name] = { pass: data.pass, isAdmin: true, isSuperAdmin: false };
+      }
+    });
+    // Nettoie les admins supprimés de Firebase
+    Object.keys(AUTH).forEach(name => {
+      if(!AUTH[name].isSuperAdmin && !snapshot.docs.find(d => d.id === name)) {
+        delete AUTH[name];
+      }
+    });
+    if(document.getElementById('adminPanel').classList.contains('open')) {
+      renderAdminList(); renderAdminDashboard();
+    }
+  });
+
 });
+
 </script>
 </body>
 </html>
