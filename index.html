@@ -236,7 +236,7 @@
 <!-- ══ FIREBASE (doit être dans le <head>, AVANT </head>) ══ -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deletedoc, setdoc, query, orderBy }
+  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, setDoc, query, orderBy }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -251,16 +251,16 @@
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
-  window._db          = db;
-  window._col         = collection;
-  window._addDoc      = addDoc;
-  window._onSnapshot  = onSnapshot;
-  window._doc         = doc;
-  window._updateDoc   = updateDoc;
-  window._updateDoc   = updateDoc;
-  window._setDoc      = setDoc;
-  window._query       = query;
-  window._orderBy     = orderBy;
+  window._db         = db;
+window._col        = collection;
+window._addDoc     = addDoc;
+window._onSnapshot = onSnapshot;
+window._doc        = doc;
+window._updateDoc  = updateDoc;
+window._deleteDoc  = deleteDoc;
+window._setDoc     = setDoc;
+window._query      = query;
+window._orderBy    = orderBy;
 
   // Prévient le reste de la page que Firebase est prêt
   window.addEventListener('DOMContentLoaded', () => {
@@ -808,8 +808,8 @@ async function addAdmin() {
   // sauvegarde dans FireBase
   await window._setDoc(window._doc(window._db,'admins',user), {pass, isAdmin:true, isSuperAdmin:false});
   AUTH[user]={pass,isAdmin:true,isSuperAdmin:false};
-  document.getElementById('newAdminUser').value=''; document.getElementById('newAdminUser').value='';
-  alertEl.textcontent=`✅ ${user} added as admin.`; alerEl.className='form-alert success'; alertEl.style.display='block';
+  document.getElementById('newAdminUser').value=''; document.getElementById('newAdminPass').value='';
+alertEl.textContent=`✅ ${user} added as admin.`; alertEl.className='form-alert success'; alertEl.style.display='block';
   setTimeout(()=>alertEl.style.display='none',4000);
   renderAdminList();  renderAdminDashboard();
 }
